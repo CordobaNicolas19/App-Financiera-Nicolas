@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Control Financiero</title>
+  <meta name="theme-color" content="#4338ca">
+  <meta name="description" content="Registra tus ingresos y gastos, define un presupuesto mensual y consulta tu saldo al instante.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💰</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- ===== Encabezado ===== -->
+  <header class="encabezado">
+    <div class="contenedor">
+      <h1>Control Financiero</h1>
+      <p class="encabezado__sub">Registra tus ingresos y gastos y mira tu saldo al instante.</p>
+    </div>
+  </header>
+
+  <main class="contenedor">
+
+    <!-- ===== 1. Panel principal: totales y presupuesto ===== -->
+    <section class="panel" aria-label="Panel principal">
+      <article class="tarjeta tarjeta-total tarjeta-total--ingreso">
+        <span class="tarjeta-total__icono" aria-hidden="true">↑</span>
+        <div>
+          <p class="tarjeta-total__titulo">Total ingresos</p>
+          <p class="tarjeta-total__valor" id="total-ingresos">$0</p>
+        </div>
+      </article>
+      <article class="tarjeta tarjeta-total tarjeta-total--gasto">
+        <span class="tarjeta-total__icono" aria-hidden="true">↓</span>
+        <div>
+          <p class="tarjeta-total__titulo">Total gastos</p>
+          <p class="tarjeta-total__valor" id="total-gastos">$0</p>
+        </div>
+      </article>
+      <article class="tarjeta tarjeta-total tarjeta-total--saldo" id="tarjeta-saldo">
+        <span class="tarjeta-total__icono" aria-hidden="true">=</span>
+        <div>
+          <p class="tarjeta-total__titulo">Saldo disponible</p>
+          <p class="tarjeta-total__valor" id="total-saldo">$0</p>
+        </div>
+      </article>
+
+      <!-- Presupuesto del mes (se dibuja desde app.js) -->
+      <article class="tarjeta presupuesto-panel" id="presupuesto-panel" aria-label="Presupuesto del mes"></article>
+    </section>
+
+    <div class="distribucion">
+
+      <!-- ===== 2. Formularios: ingreso, gasto y presupuesto ===== -->
+      <section class="tarjeta" id="seccion-formularios" aria-label="Formularios de registro">
+        <div class="pestanas" role="tablist" aria-label="¿Qué quieres registrar?">
+          <button type="button" class="pestana pestana--ingreso" role="tab" id="pestana-ingreso"
+                  data-pestana="ingreso" aria-controls="panel-ingreso" aria-selected="false" tabindex="-1">↑ Ingreso</button>
+          <button type="button" class="pestana pestana--gasto" role="tab" id="pestana-gasto"
+                  data-pestana="gasto" aria-controls="panel-gasto" aria-selected="true">↓ Gasto</button>
+          <button type="button" class="pestana pestana--presupuesto" role="tab" id="pestana-presupuesto"
+                  data-pestana="presupuesto" aria-controls="panel-presupuesto" aria-selected="false" tabindex="-1">Presupuesto</button>
+        </div>
+
+        <!-- Formulario de ingresos -->
+        <div class="panel-formulario" role="tabpanel" id="panel-ingreso" aria-labelledby="pestana-ingreso" hidden>
+          <h2>Registrar ingreso</h2>
+          <p class="ayuda">Dinero que recibes: salario, ventas, pagos de clientes…</p>
+          <form id="form-ingreso" data-tipo="ingreso" novalidate>
+            <div class="campo">
+              <label for="ingreso-concepto">Concepto</label>
+              <input id="ingreso-concepto" type="text" maxlength="60" placeholder="Ej: Salario de octubre"
+                     autocomplete="off" aria-describedby="error-ingreso-concepto">
+              <p class="campo__error" id="error-ingreso-concepto"></p>
+            </div>
+            <div class="campo">
+              <label for="ingreso-valor">Valor (pesos colombianos)</label>
+              <div class="campo__prefijo">
+                <span aria-hidden="true">$</span>
+                <input id="ingreso-valor" class="campo-dinero" type="text" inputmode="numeric" placeholder="0"
+                       autocomplete="off" aria-describedby="error-ingreso-valor">
+              </div>
+              <p class="campo__error" id="error-ingreso-valor"></p>
+            </div>
+            <div class="campo">
+              <label for="ingreso-categoria">Categoría</label>
+              <select id="ingreso-categoria" aria-describedby="error-ingreso-categoria"></select>
+              <p class="campo__error" id="error-ingreso-categoria"></p>
+            </div>
+            <div class="campo">
+              <label for="ingreso-fuente">Fuente</label>
+              <input id="ingreso-fuente" type="text" maxlength="40" placeholder="Ej: Empresa ABC, cliente, venta"
+                     autocomplete="off" aria-describedby="error-ingreso-fuente">
+              <p class="campo__error" id="error-ingreso-fuente"></p>
+            </div>
+            <div class="campo">
+              <label for="ingreso-fecha">Fecha</label>
+              <input id="ingreso-fecha" type="date" aria-describedby="error-ingreso-fecha">
+              <p class="campo__error" id="error-ingreso-fecha"></p>
+            </div>
+            <button type="submit" class="boton boton--ingreso">Registrar ingreso</button>
+          </form>
+        </div>
+
+        <!-- Formulario de gastos -->
+        <div class="panel-formulario" role="tabpanel" id="panel-gasto" aria-labelledby="pestana-gasto">
+          <h2>Registrar gasto</h2>
+          <p class="ayuda">Dinero que pagas: comida, transporte, arriendo…</p>
+          <form id="form-gasto" data-tipo="gasto" novalidate>
+            <div class="campo">
+              <label for="gasto-concepto">Concepto</label>
+              <input id="gasto-concepto" type="text" maxlength="60" placeholder="Ej: Mercado de la semana"
+                     autocomplete="off" aria-describedby="error-gasto-concepto">
+              <p class="campo__error" id="error-gasto-concepto"></p>
+            </div>
+            <div class="campo">
+              <label for="gasto-valor">Valor (pesos colombianos)</label>
+              <div class="campo__prefijo">
+                <span aria-hidden="true">$</span>
+                <input id="gasto-valor" class="campo-dinero" type="text" inputmode="numeric" placeholder="0"
+                       autocomplete="off" aria-describedby="error-gasto-valor">
+              </div>
+              <p class="campo__error" id="error-gasto-valor"></p>
+            </div>
+            <div class="campo">
+              <label for="gasto-categoria">Categoría</label>
+              <select id="gasto-categoria" aria-describedby="error-gasto-categoria"></select>
+              <p class="campo__error" id="error-gasto-categoria"></p>
+            </div>
+            <div class="campo">
+              <label for="gasto-fecha">Fecha</label>
+              <input id="gasto-fecha" type="date" aria-describedby="error-gasto-fecha">
+              <p class="campo__error" id="error-gasto-fecha"></p>
+            </div>
+            <button type="submit" class="boton boton--gasto">Registrar gasto</button>
+          </form>
+        </div>
+
+        <!-- Formulario de presupuesto mensual -->
+        <div class="panel-formulario" role="tabpanel" id="panel-presupuesto" aria-labelledby="pestana-presupuesto" hidden>
+          <h2>Presupuesto mensual</h2>
+          <p class="ayuda">Cuánto planeas gastar cada mes. En el panel verás cuánto llevas gastado del mes actual.</p>
+          <form id="form-presupuesto" novalidate>
+            <div class="campo">
+              <label for="presupuesto-monto">Monto mensual (pesos colombianos)</label>
+              <div class="campo__prefijo">
+                <span aria-hidden="true">$</span>
+                <input id="presupuesto-monto" class="campo-dinero" type="text" inputmode="numeric" placeholder="0"
+                       autocomplete="off" aria-describedby="error-presupuesto-monto">
+              </div>
+              <p class="campo__error" id="error-presupuesto-monto"></p>
+            </div>
+            <button type="submit" class="boton boton--primario">Guardar presupuesto</button>
+            <button type="button" class="boton boton--texto" id="quitar-presupuesto" hidden>Quitar presupuesto</button>
+          </form>
+        </div>
+      </section>
+
+      <div class="columna">
+
+        <!-- ===== 3. Resumen visual ===== -->
+        <section class="tarjeta" aria-labelledby="titulo-resumen">
+          <h2 id="titulo-resumen">Resumen visual</h2>
+          <div class="resumen">
+            <div>
+              <h3>Gastos por categoría</h3>
+              <div id="grafico-gastos"></div>
+            </div>
+            <div>
+              <h3>Ingresos vs. gastos</h3>
+              <div id="comparacion"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===== 4. Lista de movimientos ===== -->
+        <section class="tarjeta" aria-labelledby="titulo-lista">
+          <div class="lista-cabecera">
+            <h2 id="titulo-lista">Movimientos <span class="contador" id="contador">0</span></h2>
+            <div class="filtros" role="group" aria-label="Filtrar movimientos">
+              <button type="button" class="filtro" data-filtro="todos" aria-pressed="true">Todos</button>
+              <button type="button" class="filtro" data-filtro="ingreso" aria-pressed="false">Ingresos</button>
+              <button type="button" class="filtro" data-filtro="gasto" aria-pressed="false">Gastos</button>
+            </div>
+          </div>
+          <ul class="lista" id="lista"></ul>
+          <p class="vacio" id="lista-vacia" hidden></p>
+        </section>
+
+      </div>
+    </div>
+  </main>
+
+  <footer class="pie">
+    Tus datos se guardan solo en este navegador (no se envían a ningún servidor).
+  </footer>
+
+  <!-- Mensajes emergentes -->
+  <div class="notificaciones" id="notificaciones" aria-live="polite"></div>
+
+  <!-- Ventana de confirmación -->
+  <div class="modal" id="modal" hidden>
+    <div class="modal__caja" role="dialog" aria-modal="true" aria-labelledby="modal-titulo" aria-describedby="modal-texto">
+      <h2 id="modal-titulo"></h2>
+      <p id="modal-texto"></p>
+      <div class="modal__acciones">
+        <button type="button" class="boton boton--secundario" id="modal-cancelar">Cancelar</button>
+        <button type="button" class="boton boton--peligro" id="modal-confirmar"></button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
